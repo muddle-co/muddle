@@ -337,7 +337,7 @@ const Project: NextPage = () => {
                       >
                         <div className="h-2 w-2 rounded-full bg-current" />
                       </div>
-                      <p className="min-w-0 text-sm font-semibold leading-6 text-white">
+                      <p className="min-w-0 text-sm font-semibold leading-6 text-white truncate">
                         <button
                           onClick={() => setSelectedItem(item)}
                           className="flex gap-x-2"
