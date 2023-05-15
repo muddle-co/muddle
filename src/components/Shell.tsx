@@ -6,6 +6,7 @@ import Link from "next/link";
 import { api } from "~/utils/api";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import Landing from "./Landing";
 
 const navigation = [
   { name: "Projects", href: "/", icon: Folder },
@@ -28,16 +29,7 @@ export default function Shell({ title, children }) {
   );
 
   if (!sessionData?.user) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <button
-          onClick={() => signIn()}
-          className="rounded-md bg-gray-900 px-4 py-2 text-white"
-        >
-          Sign in
-        </button>
-      </div>
-    );
+    return <Landing />;
   }
 
   return (
