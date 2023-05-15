@@ -15,6 +15,24 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
+  createTeam: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      return prisma.team.create({
+        data: {
+          name: input.name,
+          members: {
+            connect: {
+              id: ctx.session.user.id,
+            },
+          },
+        },
+      });
+    }),
   addUserToTeam: protectedProcedure
     .input(
       z.object({
@@ -48,27 +66,27 @@ export const userRouter = createTRPCRouter({
       });
     }),
   getUsers: protectedProcedure.query(async ({ ctx }) => {
-      // Find team by ctx userId and return all users in that team
-      const team = await prisma.team.findFirst({
-        where: {
-          members: {
-            some: {
-              id: ctx.session.user.id,
-            },
+    // Find team by ctx userId and return all users in that team
+    const team = await prisma.team.findFirst({
+      where: {
+        members: {
+          some: {
+            id: ctx.session.user.id,
           },
         },
-      });
-      if (!team) {
-        return [];
-      }
-      return prisma.user.findMany({
-        where: {
-          team: {
-            id: team.id,
-          },
+      },
+    });
+    if (!team) {
+      return [];
+    }
+    return prisma.user.findMany({
+      where: {
+        team: {
+          id: team.id,
         },
-      });
-    }),
+      },
+    });
+  }),
   modifyUser: protectedProcedure
     .input(
       z.object({

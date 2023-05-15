@@ -2,12 +2,13 @@ import { type NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Shell from "~/components/Shell";
 import * as Popover from "@radix-ui/react-popover";
+import * as Collapsible from "@radix-ui/react-collapsible";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
 import { api } from "~/utils/api";
-import { ChevronRight, FolderPlus, Pencil, Plus } from "lucide-react";
+import { Users, ChevronRight, FolderPlus, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import EmptyState from "~/components/EmptyState";
@@ -20,6 +21,8 @@ const Home: NextPage = () => {
   const { data: sessionData } = useSession();
   const [projectName, setProjectName] = useState();
   const [projectTeam, setProjectTeam] = useState(null);
+
+  const [teamName, setTeamName] = useState();
 
   const utils = api.useContext();
 
@@ -49,6 +52,28 @@ const Home: NextPage = () => {
     }
   };
 
+  const createTeamMutation = api.user.createTeam.useMutation({
+    onSuccess: async () => {
+      await utils.user.getTeams.invalidate();
+      await utils.projects.getProjects.invalidate();
+      await utils.projects.getAudits.invalidate();
+    },
+  });
+
+  const handleTeamCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!teamName) return;
+
+    try {
+      await createTeamMutation.mutateAsync({
+        name: teamName,
+      });
+      setTeamName(null);
+    } catch (error) {
+      console.error("Error creating team:", error);
+    }
+  };
+
   const { data: teams } = api.user.getTeams.useQuery(
     undefined, // no input
     { enabled: sessionData?.user !== undefined }
@@ -67,6 +92,88 @@ const Home: NextPage = () => {
   return (
     <>
       <Shell title="Dashboard">
+        {teams && teams.length === 0 && (
+          <div
+            className="relative z-10"
+            aria-labelledby="modal-title"
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="fixed inset-0 bg-gray-900 bg-opacity-75 backdrop-blur-sm transition-opacity"></div>
+
+            <div className="fixed inset-0 z-10 overflow-y-auto">
+              <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div className="relative transform overflow-hidden rounded-lg border border-gray-700 bg-gray-800 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                  <div>
+                    <Users className="mx-auto h-12 w-12 text-indigo-400" />
+                    <div className="mt-4 text-center">
+                      <h3 className="text-xl text-white" id="modal-title">
+                        Create or join a team
+                      </h3>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500">
+                          All of your work happens in teams, so you can invite
+                          others to collaborate easily. Create or join one to
+                          get started.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                    <Collapsible.Root>
+                      <Collapsible.Trigger className="w-full">
+                        <button
+                          type="button"
+                          className="inline-flex max-h-10 w-full justify-center rounded-md bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
+                        >
+                          Create a team
+                        </button>
+                      </Collapsible.Trigger>
+                      <Collapsible.Content>
+                        <div className="mt-4 w-full rounded border border-gray-600 bg-gray-700 px-2 py-2 text-sm text-gray-200">
+                          <form onSubmit={handleTeamCreate}>
+                            <input
+                              value={teamName}
+                              onChange={(e) => setTeamName(e.target.value)}
+                              type="text"
+                              className="rounded-t border-t border-l border-r border-gray-600 bg-gray-800 px-4 py-2 w-full outline-none"
+                              placeholder="Team name"
+                            />
+                            <button
+                              type="submit"
+                              className="rounded-b border border-gray-600 bg-indigo-800 text-white px-4 py-2 text-xs w-full font-medium"
+                            >
+                              Create
+                            </button>
+                          </form>
+                        </div>
+                      </Collapsible.Content>
+                    </Collapsible.Root>
+                    <Collapsible.Root>
+                      <Collapsible.Trigger className="w-full">
+                        <button
+                          type="button"
+                          className="mt-3 inline-flex max-h-10 w-full justify-center rounded-md border border-gray-600 bg-gray-700 px-3 py-2.5 text-sm font-semibold text-gray-100 shadow-sm hover:bg-gray-600 sm:col-start-1 sm:mt-0"
+                        >
+                          Join a team
+                        </button>
+                      </Collapsible.Trigger>
+                      <Collapsible.Content>
+                        <div className="mt-4 w-full rounded border border-gray-600 bg-gray-700 px-4 py-2 text-sm text-gray-200">
+                          A team owner must invite you by email.
+                          <span className="mt-2 block text-xs text-gray-400">
+                            If you&apos;ve been invited but aren&apos;t seeing
+                            anything yet, refresh the page.
+                          </span>
+                        </div>
+                      </Collapsible.Content>
+                    </Collapsible.Root>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <main className="lg:pr-96">
           <header className="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
             <h1 className="text-lg text-white">Projects</h1>
@@ -88,7 +195,7 @@ const Home: NextPage = () => {
                     </div>
                     <form onSubmit={handleProjectCreate}>
                       <select
-                        className="bg-gray-800 px-4 py-2 outline-none mr-2"
+                        className="mr-2 bg-gray-800 px-4 py-2 outline-none"
                         onChange={(e) => {
                           setProjectTeam(e.target.value);
                         }}
@@ -104,7 +211,7 @@ const Home: NextPage = () => {
                         value={projectName}
                         onChange={(e) => setProjectName(e.target.value)}
                         type="text"
-                        className="bg-gray-800 px-4 py-2 outline-none border-l border-gray-600"
+                        className="border-l border-gray-600 bg-gray-800 px-4 py-2 outline-none"
                         placeholder="Project name"
                       />
                       <button
@@ -121,7 +228,13 @@ const Home: NextPage = () => {
           </header>
 
           <div className="mx-8 mt-8">
-            {projects && projects.length === 0 && <EmptyState icon={FolderPlus} heading="You don't have any projects" description="Create a new one to get started." />}
+            {projects && projects.length === 0 && (
+              <EmptyState
+                icon={FolderPlus}
+                heading="You don't have any projects"
+                description="Create a new one to get started."
+              />
+            )}
             <ul
               role="list"
               className="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
@@ -176,7 +289,15 @@ const Home: NextPage = () => {
           <header className="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
             <h2 className="text-lg text-white">Activity feed</h2>
           </header>
-          {audits && audits.length === 0 && <div className="my-8"><EmptyState icon={Pencil} heading="You haven't performed any audits" description="Record an audit and it will show up here." /></div>}
+          {audits && audits.length === 0 && (
+            <div className="my-8">
+              <EmptyState
+                icon={Pencil}
+                heading="You haven't performed any audits"
+                description="Record an audit and it will show up here."
+              />
+            </div>
+          )}
           <ul role="list" className="divide-y divide-white/5">
             {audits &&
               audits.map((audit) => (

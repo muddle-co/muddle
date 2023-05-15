@@ -1,15 +1,7 @@
 import { Fragment, useState } from "react";
 import Head from "next/head";
 import { Dialog, Transition } from "@headlessui/react";
-import {
-  Menu,
-  Calendar,
-  Copy,
-  Folder,
-  Users,
-  X,
-  Cog,
-} from "lucide-react";
+import { Menu, Calendar, Copy, Folder, Users, X, Cog } from "lucide-react";
 import Link from "next/link";
 import { api } from "~/utils/api";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -144,24 +136,28 @@ export default function Shell({ title, children }) {
                             Your projects
                           </div>
                           <ul role="list" className="-mx-2 mt-2 space-y-1">
-                            {projects && projects.map((project) => (
-                              <li key={project.id}>
-                              <Link
-                                href={"/projects/" + project.id}
-                                className={classNames(
-                                  router.asPath === "/projects/" + project.id
-                                    ? "bg-gray-800 text-white"
-                                    : "text-gray-400 hover:bg-gray-800 hover:text-white",
-                                  "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
-                                )}
-                              >
-                                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white">
-                                    {project.name.substring(0, 2)}
-                                  </span>
-                                  <span className="truncate">{project.name}</span>
-                              </Link>
-                            </li>
-                            ))}
+                            {projects &&
+                              projects.map((project) => (
+                                <li key={project.id}>
+                                  <Link
+                                    href={"/projects/" + project.id}
+                                    className={classNames(
+                                      router.asPath ===
+                                        "/projects/" + project.id
+                                        ? "bg-gray-800 text-white"
+                                        : "text-gray-400 hover:bg-gray-800 hover:text-white",
+                                      "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
+                                    )}
+                                  >
+                                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white">
+                                      {project.name.substring(0, 2)}
+                                    </span>
+                                    <span className="truncate">
+                                      {project.name}
+                                    </span>
+                                  </Link>
+                                </li>
+                              ))}
                           </ul>
                         </li>
                       </ul>
@@ -196,7 +192,7 @@ export default function Shell({ title, children }) {
                           )}
                         >
                           <item.icon
-                            className="h-5 w-5 mt-0.5 shrink-0"
+                            className="mt-0.5 h-5 w-5 shrink-0"
                             aria-hidden="true"
                           />
                           {item.name}
@@ -206,9 +202,11 @@ export default function Shell({ title, children }) {
                   </ul>
                 </li>
                 <li>
-                  <div className="text-xs font-semibold leading-6 text-gray-400">
-                    Your projects
-                  </div>
+                  {projects && projects.length > 0 && (
+                    <div className="text-xs font-semibold leading-6 text-gray-400">
+                      Your projects
+                    </div>
+                  )}
                   <ul role="list" className="-mx-2 mt-2 space-y-1">
                     {projects &&
                       projects.map((project) => (
@@ -235,7 +233,7 @@ export default function Shell({ title, children }) {
                 <li className="-mx-6 mt-auto">
                   <button
                     onClick={() => signOut()}
-                    className="w-full flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
+                    className="flex w-full items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
                   >
                     <img
                       className="h-8 w-8 rounded-full bg-indigo-800"
@@ -243,7 +241,9 @@ export default function Shell({ title, children }) {
                       alt={sessionData.user?.name || "Unknown"}
                     />
                     <span className="sr-only">Your profile</span>
-                    <span aria-hidden="true">{sessionData.user?.name || "Unknown"}</span>
+                    <span aria-hidden="true">
+                      {sessionData.user?.name || "Unknown"}
+                    </span>
                   </button>
                 </li>
               </ul>
