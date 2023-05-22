@@ -108,6 +108,8 @@ const Project: NextPage = () => {
   const handleItemUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!itemName) setItemName("");
+
     try {
       if (itemFrequencyValue === 0) {
         await modifyItemMutation.mutateAsync({
