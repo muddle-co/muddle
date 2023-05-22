@@ -105,7 +105,7 @@ const Team: NextPage = () => {
                     className="col-span-1 flex rounded-md shadow-sm"
                   >
                     <img
-                      src={user.image}
+                      src={user.image || "/logo.svg"}
                       className="flex w-16 flex-shrink-0 items-center justify-center rounded-l-md border-b border-l border-t border-gray-700 text-sm font-medium text-white"
                     />
                     <div className="flex flex-1 items-center justify-between truncate rounded-r-md border-b border-r border-t border-gray-700 bg-gray-800">
