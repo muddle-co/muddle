@@ -3,5 +3,26 @@
 @tailwind utilities;
 
 body {
-    background-color: rgb(17 24 39);
+  background-color: rgb(17 24 39);
+}
+
+/* Set the width and height of the scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #101827;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #1f2937;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #394b65;
 }
