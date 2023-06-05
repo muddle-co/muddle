@@ -8,16 +8,9 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
 import { api } from "~/utils/api";
-import {
-  ChevronDown,
-  ChevronRight,
-  ListPlus,
-  Pencil,
-  Plus,
-  Trash,
-  X,
-} from "lucide-react";
+import { ChevronDown, Pencil, Plus, Trash, X } from "lucide-react";
 import { useRouter } from "next/router";
+import ItemList from "~/components/ItemsList";
 
 const statuses = {
   inactive: "text-gray-500 bg-gray-100/10",
@@ -29,13 +22,7 @@ const statuses = {
   high: "text-red-400 bg-red-400/10",
 };
 
-const results = {
-  inactive: "text-gray-300 bg-gray-100/10 ring-gray-400/20",
-  pass: "text-green-400 bg-green-400/10 ring-green-400/20",
-  fail: "text-rose-400 bg-rose-400/10 ring-rose-400/30",
-};
-
-function classNames(...classes) {
+function classNames(...classes: (string | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
@@ -305,92 +292,12 @@ const Project: NextPage = () => {
           </header>
 
           {/* Item list */}
-          {items && items.length === 0 && (
-            <div className="mt-8 flex items-center justify-center lg:mt-24">
-              <ListPlus
-                className="mr-4 mt-0.5 h-12 w-12 text-white/50"
-                aria-hidden="true"
-              />
-              <div>
-                <h2 className="text-lg text-white">No items found</h2>
-                <p className="text-xs text-gray-500">
-                  Add a new item to get started
-                </p>
-              </div>
-            </div>
-          )}
-          <ul role="list" className="divide-y divide-white/5">
-            {items &&
-              items.map((item) => (
-                <li
-                  key={item.id}
-                  className={classNames(
-                    selectedItem?.id === item.id && "bg-gray-800/40",
-                    "relative flex items-center space-x-4 px-4 py-4 hover:bg-gray-800/20 sm:px-6 lg:px-8"
-                  )}
-                >
-                  <div className="min-w-0 flex-auto">
-                    <div className="flex items-center gap-x-3">
-                      <div
-                        className={classNames(
-                          statuses[item.audits[0]?.status] || statuses.inactive,
-                          "flex-none rounded-full p-1"
-                        )}
-                      >
-                        <div className="h-2 w-2 rounded-full bg-current" />
-                      </div>
-                      <p className="min-w-0 text-sm font-semibold leading-6 text-white truncate">
-                        <button
-                          onClick={() => setSelectedItem(item)}
-                          className="flex gap-x-2"
-                        >
-                          <span className="truncate">
-                            {
-                              projects?.find(
-                                (project) => project.id === router.query.project
-                              )?.name
-                            }
-                          </span>
-                          <span className="text-gray-400">-</span>
-                          <span className="whitespace-nowrap">{item.name}</span>
-                          <span className="absolute inset-0" />
-                        </button>
-                      </p>
-                    </div>
-                    <div className="mt-3 flex items-center gap-x-2.5 text-xs leading-5 text-gray-400">
-                      <p className="truncate">{item.audits?.length} audits</p>
-                      <svg
-                        viewBox="0 0 2 2"
-                        className="h-0.5 w-0.5 flex-none fill-gray-300"
-                      >
-                        <circle cx={1} cy={1} r={1} />
-                      </svg>
-                      <p className="whitespace-nowrap">
-                        {item?.frequency &&
-                        item.frequency.value &&
-                        item.frequency.unit
-                          ? `Due ${dayjs(item?.audits[0]?.createdAt)
-                              .add(item.frequency.value, item.frequency.unit)
-                              .fromNow()}`
-                          : "No due date"}
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    className={classNames(
-                      results[item.audits[0]?.status] || results.inactive,
-                      "flex-none rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset"
-                    )}
-                  >
-                    {item.audits[0]?.status.toUpperCase() || "NO AUDITS"}
-                  </div>
-                  <ChevronRight
-                    className="h-5 w-5 flex-none text-gray-400"
-                    aria-hidden="true"
-                  />
-                </li>
-              ))}
-          </ul>
+          <ItemList
+            projects={projects}
+            items={items}
+            selectedItem={selectedItem}
+            setSelectedItem={setSelectedItem}
+          />
         </main>
 
         {selectedItem && (
@@ -737,7 +644,10 @@ const Project: NextPage = () => {
                       <td className="hidden space-y-2 py-4 pl-0 pr-4 text-right text-sm leading-6 text-gray-400 sm:table-cell sm:pr-6 lg:pr-8">
                         <Popover.Root>
                           <Popover.Trigger asChild>
-                            <button onClick={() => setSelectedAudit(audit.id)} className="ml-auto mt-1 flex text-xs text-indigo-400 hover:text-indigo-300">
+                            <button
+                              onClick={() => setSelectedAudit(audit.id)}
+                              className="ml-auto mt-1 flex text-xs text-indigo-400 hover:text-indigo-300"
+                            >
                               <Pencil className="h-4 w-4" aria-hidden="true" />
                             </button>
                           </Popover.Trigger>
@@ -783,7 +693,10 @@ const Project: NextPage = () => {
                             </Popover.Content>
                           </Popover.Portal>
                         </Popover.Root>
-                        <button onClick={() => handleAuditDelete(audit.id)} className="ml-auto mt-1 flex text-xs text-indigo-400 hover:text-indigo-300">
+                        <button
+                          onClick={() => handleAuditDelete(audit.id)}
+                          className="ml-auto mt-1 flex text-xs text-indigo-400 hover:text-indigo-300"
+                        >
                           <Trash className="h-4 w-4" aria-hidden="true" />
                         </button>
                       </td>

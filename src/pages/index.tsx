@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useState } from "react";
 import EmptyState from "~/components/EmptyState";
 
-function classNames(...classes) {
+function classNames(...classes: (string | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
 

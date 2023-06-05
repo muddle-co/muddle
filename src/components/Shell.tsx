@@ -1,10 +1,10 @@
 import { Fragment, useState } from "react";
 import Head from "next/head";
 import { Dialog, Transition } from "@headlessui/react";
-import { Menu, Calendar, Copy, Folder, Users, X, Cog } from "lucide-react";
+import { Menu, Folder, Users, X, Cog } from "lucide-react";
 import Link from "next/link";
 import { api } from "~/utils/api";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import Landing from "./Landing";
 
@@ -14,11 +14,16 @@ const navigation = [
   { name: "Settings", href: "/settings", icon: Cog },
 ];
 
-function classNames(...classes) {
+function classNames(...classes: (string | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Shell({ title, children }) {
+interface ShellProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+export default function Shell({ title, children }: ShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
   const { data: sessionData, status } = useSession();
@@ -255,12 +260,12 @@ export default function Shell({ title, children }) {
                   >
                     <img
                       className="h-8 w-8 rounded-full bg-indigo-800"
-                      src={sessionData.user?.image || "/logo.svg"}
-                      alt={sessionData.user?.name || "Unknown"}
+                      src={sessionData?.user?.image || "/logo.svg"}
+                      alt={sessionData?.user?.name || "Unknown"}
                     />
                     <span className="sr-only">Your profile</span>
                     <span aria-hidden="true">
-                      {sessionData.user?.name || "Unknown"}
+                      {sessionData?.user?.name || "Unknown"}
                     </span>
                   </button>
                 </li>
@@ -285,8 +290,8 @@ export default function Shell({ title, children }) {
             <span className="sr-only">Your profile</span>
             <img
               className="h-8 w-8 rounded-full bg-gray-800"
-              src={sessionData.user?.image}
-              alt={sessionData.user?.name || "Unknown"}
+              src={sessionData?.user?.image || "/logo.svg"}
+              alt={sessionData?.user?.name || "Unknown"}
             />
           </button>
         </div>

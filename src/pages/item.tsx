@@ -38,7 +38,7 @@ const activityItems = [
   // More items...
 ];
 
-function classNames(...classes) {
+function classNames(...classes: (string | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
