@@ -33,6 +33,7 @@ const Project: NextPage = () => {
   const [selectedItem, setSelectedItem] = useState();
 
   const [itemName, setItemName] = useState();
+  const [itemDescription, setItemDescription] = useState();
   const [itemFrequencyUnit, setItemFrequencyUnit] = useState("day");
   const [itemFrequencyValue, setItemFrequencyValue] = useState(0);
 
@@ -95,7 +96,8 @@ const Project: NextPage = () => {
   const handleItemUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!itemName) setItemName("");
+    if (!itemName) setItemName(selectedItem.name || "");
+    if (!itemDescription) setItemDescription(selectedItem.description || "");
 
     try {
       if (itemFrequencyValue === 0) {
@@ -103,12 +105,14 @@ const Project: NextPage = () => {
           item: selectedItem.id,
           project: router.query.project?.toString(),
           name: itemName,
+          description: itemDescription,
         });
       } else {
         await modifyItemMutation.mutateAsync({
           item: selectedItem.id,
           project: router.query.project?.toString(),
           name: itemName,
+          description: itemDescription,
           frequency: {
             unit: itemFrequencyUnit,
             value: parseInt(itemFrequencyValue),
@@ -116,6 +120,7 @@ const Project: NextPage = () => {
         });
       }
       setItemName();
+      setItemDescription();
       setItemFrequencyUnit("day");
       setItemFrequencyValue(0);
     } catch (error) {
@@ -466,6 +471,61 @@ const Project: NextPage = () => {
                   </p>
                 </div>
               ))}
+            </div>
+
+            <div className="flex border-t border-white/10 bg-gray-700/10 px-8 py-4">
+              {selectedItem.description ? (
+                <div>
+                  <h2 className="font-semibold leading-7 text-white">
+                    Description
+                  </h2>
+                  <p className="text-sm text-gray-400">
+                    {(selectedItem as { description?: string }).description}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-sm text-gray-400">
+                    This item is missing a description.
+                  </p>
+                </div>
+              )}
+              <Popover.Root>
+                <Popover.Trigger asChild>
+                  <button className="ml-auto">
+                    <Pencil
+                      className="mb-0.5 h-5 w-5 text-gray-400 hover:text-gray-200"
+                      aria-hidden="true"
+                    />
+                  </button>
+                </Popover.Trigger>
+                <Popover.Portal>
+                  <Popover.Content>
+                    <div className="mr-6 mt-2 rounded-sm border border-gray-700 bg-gray-800 text-sm text-white animate-in fade-in slide-in-from-top">
+                      <div className="border-b border-gray-600 bg-gray-800 px-4 py-2">
+                        <h3>Edit the description of this item</h3>
+                        <p className="text-xs text-gray-500">
+                          Give this item a description to help explain more details
+                        </p>
+                      </div>
+                      <form onSubmit={handleItemUpdate}>
+                        <input
+                          defaultValue={selectedItem?.description}
+                          onChange={(e) => setItemDescription(e.target.value)}
+                          type="text"
+                          className="w-96 bg-gray-800 px-4 py-2 outline-none"
+                        />
+                        <button
+                          type="submit"
+                          className="border-l border-gray-600 px-4 text-xs font-medium"
+                        >
+                          Update
+                        </button>
+                      </form>
+                    </div>
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
             </div>
 
             {/* Activity list */}

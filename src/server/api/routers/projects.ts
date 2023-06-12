@@ -119,6 +119,7 @@ export const projectsRouter = createTRPCRouter({
         item: z.string(),
         project: z.string().optional(),
         name: z.string().optional(),
+        description: z.string().optional(),
         frequency: z.object({ value: z.number(), unit: z.string() }).optional(),
       })
     )
@@ -129,6 +130,7 @@ export const projectsRouter = createTRPCRouter({
         },
         data: {
           name: input.name,
+          description: input.description,
           frequency: input.frequency,
           project: {
             connect: {
