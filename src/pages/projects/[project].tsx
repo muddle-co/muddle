@@ -8,7 +8,15 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
 import { api } from "~/utils/api";
-import { ChevronDown, Pencil, Plus, Trash, X } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  Loader,
+  Pencil,
+  Plus,
+  Trash,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/router";
 import ItemList from "~/components/ItemsList";
 
@@ -45,6 +53,8 @@ const Project: NextPage = () => {
   const [findingSeverity, setFindingSeverity] = useState("info");
   const [findingNotes, setFindingNotes] = useState();
 
+  const [buttonState, setButtonState] = useState("");
+
   const { data: projects } = api.projects.getProjects.useQuery(
     undefined, // no input
     { enabled: sessionData?.user !== undefined }
@@ -80,6 +90,7 @@ const Project: NextPage = () => {
 
   const handleItemCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setButtonState("loading");
     if (!itemName) return;
 
     try {
@@ -88,13 +99,22 @@ const Project: NextPage = () => {
         name: itemName,
       });
       setItemName(null);
+      setButtonState("success");
+      setTimeout(() => {
+        setButtonState("");
+      }, 1000);
     } catch (error) {
       console.error("Error creating item:", error);
+      setButtonState("error");
+      setTimeout(() => {
+        setButtonState("");
+      }, 1000);
     }
   };
 
   const handleItemUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setButtonState("loading");
 
     if (!itemName) setItemName(selectedItem.name || "");
     if (!itemDescription) setItemDescription(selectedItem.description || "");
@@ -130,8 +150,16 @@ const Project: NextPage = () => {
       setItemDescription();
       setItemFrequencyUnit("day");
       setItemFrequencyValue(0);
+      setButtonState("success");
+      setTimeout(() => {
+        setButtonState("");
+      }, 1000);
     } catch (error) {
       console.error("Error updating item:", error);
+      setButtonState("error");
+      setTimeout(() => {
+        setButtonState("");
+      }, 1000);
     }
   };
 
@@ -161,6 +189,7 @@ const Project: NextPage = () => {
 
   const handleAuditCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setButtonState("loading");
 
     try {
       await createAuditMutation.mutateAsync({
@@ -173,8 +202,16 @@ const Project: NextPage = () => {
       setAuditDate();
       setAuditStatus("pass");
       setAuditNotes();
+      setButtonState("success");
+      setTimeout(() => {
+        setButtonState("");
+      }, 1000);
     } catch (error) {
       console.error("Error creating audit:", error);
+      setButtonState("error");
+      setTimeout(() => {
+        setButtonState("");
+      }, 1000);
     }
   };
 
@@ -197,6 +234,7 @@ const Project: NextPage = () => {
 
   const handleFindingCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setButtonState("loading");
 
     try {
       await createFindingMutation.mutateAsync({
@@ -206,8 +244,16 @@ const Project: NextPage = () => {
       });
       setFindingSeverity("info");
       setFindingNotes("");
+      setButtonState("success");
+      setTimeout(() => {
+        setButtonState("");
+      }, 1000);
     } catch (error) {
       console.error("Error creating finding:", error);
+      setButtonState("error");
+      setTimeout(() => {
+        setButtonState("");
+      }, 1000);
     }
   };
 
@@ -294,7 +340,20 @@ const Project: NextPage = () => {
                         type="submit"
                         className="border-l border-gray-600 px-4 text-xs font-medium"
                       >
-                        Create
+                        {buttonState === "" && "Create"}
+                        {buttonState === "success" ? (
+                          <Check
+                            className="mx-2 mt-2 h-4 w-4 text-green-400"
+                            aria-hidden="true"
+                          />
+                        ) : buttonState === "loading" ? (
+                          <Loader
+                            className="mx-2 mt-2 h-4 w-4 animate-spin"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          ""
+                        )}
                       </button>
                     </form>
                   </div>
@@ -346,7 +405,20 @@ const Project: NextPage = () => {
                             type="submit"
                             className="border-l border-gray-600 px-4 text-xs font-medium"
                           >
-                            Update
+                            {buttonState === "" && "Update"}
+                            {buttonState === "success" ? (
+                              <Check
+                                className="mx-2 mt-2 h-4 w-4 text-green-400"
+                                aria-hidden="true"
+                              />
+                            ) : buttonState === "loading" ? (
+                              <Loader
+                                className="mx-2 mt-2 h-4 w-4 animate-spin"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              ""
+                            )}
                           </button>
                         </form>
                       </div>
@@ -442,7 +514,20 @@ const Project: NextPage = () => {
                           type="submit"
                           className="border-l border-gray-600 px-4 text-xs font-medium"
                         >
-                          Update
+                          {buttonState === "" && "Update"}
+                          {buttonState === "success" ? (
+                            <Check
+                              className="mx-2 mt-2 h-4 w-4 text-green-400"
+                              aria-hidden="true"
+                            />
+                          ) : buttonState === "loading" ? (
+                            <Loader
+                              className="mx-2 mt-2 h-4 w-4 animate-spin"
+                              aria-hidden="true"
+                            />
+                          ) : (
+                            ""
+                          )}
                         </button>
                       </form>
                     </div>
@@ -527,7 +612,20 @@ const Project: NextPage = () => {
                           type="submit"
                           className="border-l border-gray-600 px-4 text-xs font-medium"
                         >
-                          Update
+                          {buttonState === "" && "Update"}
+                          {buttonState === "success" ? (
+                            <Check
+                              className="mx-2 mt-2 h-4 w-4 text-green-400"
+                              aria-hidden="true"
+                            />
+                          ) : buttonState === "loading" ? (
+                            <Loader
+                              className="mx-2 mt-2 h-4 w-4 animate-spin"
+                              aria-hidden="true"
+                            />
+                          ) : (
+                            ""
+                          )}
                         </button>
                       </form>
                     </div>
@@ -584,7 +682,20 @@ const Project: NextPage = () => {
                             type="submit"
                             className="border-l border-gray-600 px-4 text-xs font-medium"
                           >
-                            Create
+                            {buttonState === "" && "Create"}
+                            {buttonState === "success" ? (
+                              <Check
+                                className="mx-2 mt-2 h-4 w-4 text-green-400"
+                                aria-hidden="true"
+                              />
+                            ) : buttonState === "loading" ? (
+                              <Loader
+                                className="mx-2 mt-2 h-4 w-4 animate-spin"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              ""
+                            )}
                           </button>
                         </form>
                       </div>
@@ -754,7 +865,20 @@ const Project: NextPage = () => {
                                     type="submit"
                                     className="border-l border-gray-600 px-4 text-xs font-medium"
                                   >
-                                    Create
+                                    {buttonState === "" && "Create"}
+                                    {buttonState === "success" ? (
+                                      <Check
+                                        className="mx-2 mt-2 h-4 w-4 text-green-400"
+                                        aria-hidden="true"
+                                      />
+                                    ) : buttonState === "loading" ? (
+                                      <Loader
+                                        className="mx-2 mt-2 h-4 w-4 animate-spin"
+                                        aria-hidden="true"
+                                      />
+                                    ) : (
+                                      ""
+                                    )}
                                   </button>
                                 </form>
                               </div>
