@@ -99,6 +99,13 @@ const Project: NextPage = () => {
     if (!itemName) setItemName(selectedItem.name || "");
     if (!itemDescription) setItemDescription(selectedItem.description || "");
 
+    if (selectedItem) {
+      setSelectedItem({
+        ...selectedItem,
+        description: itemDescription,
+      });
+    }
+
     try {
       if (itemFrequencyValue === 0) {
         await modifyItemMutation.mutateAsync({
@@ -505,7 +512,8 @@ const Project: NextPage = () => {
                       <div className="border-b border-gray-600 bg-gray-800 px-4 py-2">
                         <h3>Edit the description of this item</h3>
                         <p className="text-xs text-gray-500">
-                          Give this item a description to help explain more details
+                          Give this item a description to help explain more
+                          details
                         </p>
                       </div>
                       <form onSubmit={handleItemUpdate}>
