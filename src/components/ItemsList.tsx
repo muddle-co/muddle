@@ -22,6 +22,7 @@ type Item = {
   date: string;
   audits: Audit[];
   frequency?: Frequency;
+  createdAt: string;
 };
 
 type Project = {
@@ -82,7 +83,15 @@ export default function ItemList({
       )}
       <ul role="list" className="divide-y divide-white/5">
         {items &&
-          items.map((item) => (
+          items.sort((a, b) => {
+            if (a.createdAt < b.createdAt) {
+              return -1;
+            }
+            if (a.createdAt > b.createdAt) {
+              return 1;
+            }
+            return 0;
+          }).map((item) => (
             <li
               key={item.id}
               className={classNames(
